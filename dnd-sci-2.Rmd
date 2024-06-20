@@ -70,6 +70,19 @@ options
 ### Exploratory Data Analysis
 
 ```{r}
+# items %>% arrange(desc(mana)) %>% arrange(desc(type)) 
+items %>% group_by(type) %>% summarize(mean_reading = mean(reading), sd_reading = sd(reading), mean_mana = mean(mana), sd_mana = sd(mana))
+```
 
+I notice that when grouped by type, typically the mean mana is between 20-22 and the sd between 12-16. This occurs whether the mean reading for that item type is 17 or 41, and almost seems to be unrelated to the reading. 
+
+```{r}
+
+```
+
+
+```{r}
+items %>% group_by(property) %>% summarize(mean_reading = mean(reading), sd_reading = sd(reading), mean_mana = mean(mana), sd_mana = sd(mana))
+items %>% group_by(type, property) %>% summarize(mean_reading = mean(reading), sd_reading = sd(reading), mean_mana = mean(mana), sd_mana = sd(mana))
 ```
 
