@@ -1,0 +1,75 @@
+---
+title: "Solving D&D.Sci II: The Sorceror's Personal Shop"
+author: "Conor Bekaert"
+output: pdf_document
+date: "2024-06-19"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Data Loading
+
+
+```{r load-packages, message=FALSE}
+# Load packages
+library(tidyverse)
+library(stringr)
+
+``` 
+
+
+```{r}
+# Load the wizard's list of items sacrificed and the resulting mana value
+items_data <- read.csv("dnd_2_mana.csv")
+items_data <- dplyr::rename(items_data, item=Item.name, glow=Glow.color, reading=Thaumometer.reading, mana=Mana.gained.from.sacrifice)
+items_data
+```
+
+```{r}
+# Load the list of available items in the magic shop
+items_available <- read.csv("dnd-2-options.csv")
+items_available <- dplyr::rename(items_available, item=Item.name, glow=Glow.color, reading=Thaumometer.reading, price=Price)
+items_available
+```
+
+
+### Data Cleaning
+
+```{r}
+# Documentation: https://tidyr.tidyverse.org/reference/separate_wider_delim.html
+clean_item_names <- function(data) {
+  # Split column of item names into item type (i.e. Warhammer, Amulet, etc), the word "of" (will be deleted later), the item's property (i.e    Rage, Melancholy, Abstraction, etc), and the bonus (i.e. +1, +5, or NA in some cases). 
+  # `names` sets the names of the columns to be created
+  # `too_few` handles the case where a row doesn't separate into four words (only happens when the item doesn't have a bonus)
+  data <- data %>% separate_wider_delim(cols=item, delim=" ", names=c("type", "of", "property", "bonus"), too_few="align_start")
+  
+  # Remove the column of "of"s that appear between the item type and property for all items
+  data <- data %>% subset(select=-c(of))
+  # Set items without a bonus to have bonus 0
+  data$bonus <- as.numeric(data$bonus)
+  data <- data %>% replace_na(list(bonus=0))
+  data
+}
+```
+
+```{r}
+# Split the names of the items into their useful characteristics (item type,
+# property, and bonus).
+items <- clean_item_names(items_data)
+options <- clean_item_names(items_available)
+items
+
+# Link: https://stackoverflow.com/questions/42744274/string-manipulation-in-a-column
+# Remove trailing "gp" from prices. 
+options <- options %>% mutate(price = str_replace(price, "\\gp",""))
+options
+```
+
+### Exploratory Data Analysis
+
+```{r}
+
+```
+
